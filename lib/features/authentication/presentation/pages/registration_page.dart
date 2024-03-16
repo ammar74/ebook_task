@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_task/core/utils/constants.dart';
 import 'package:ebook_task/core/widgets/custom_button.dart';
 import 'package:ebook_task/core/widgets/show_snackbar.dart';
-import 'package:ebook_task/features/admin_panel/presentation/pages/admin_page.dart';
 import 'package:ebook_task/features/authentication/data/user_model.dart';
 import 'package:ebook_task/features/authentication/presentation/pages/login_page.dart';
 import 'package:ebook_task/features/authentication/presentation/widgets/custom_text_field.dart';
-import 'package:ebook_task/features/book_management/presentation/pages/books_listView.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -189,11 +187,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Future<void> registerUser(String email, String password, String rool) async {
+  Future<void> registerUser(String email, String password, String role) async {
     try {
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => {postDetailsToFirestore(email, rool)})
+          .then((value) => {postDetailsToFirestore(email, role)})
           .catchError((e) {});
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

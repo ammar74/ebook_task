@@ -1,4 +1,6 @@
 import 'package:ebook_task/core/utils/constants.dart';
+import 'package:ebook_task/core/widgets/custom_app_bar.dart';
+import 'package:ebook_task/features/admin_panel/presentation/widgets/user_activation_section.dart';
 import 'package:flutter/material.dart';
 
 class AdminPage extends StatelessWidget {
@@ -8,16 +10,19 @@ class AdminPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: kPrimaryColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            ' This is the Admin Page ',
-            style: TextStyle(color: Colors.white, fontSize: 24),
-          )
-        ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: kPrimaryColor,
+        body: Column(
+          children: [
+            CustomAppBar(
+              title: 'E-Books',
+              icon: Icons.logout_outlined,
+              onPressed: () {},
+            ),
+            const UserActivationSection(),
+          ],
+        ),
       ),
     );
   }

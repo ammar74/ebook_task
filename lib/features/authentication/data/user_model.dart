@@ -11,4 +11,8 @@ class UserModel {
       this.password,
       this.isAdmin = false,
       this.isActivated = false});
+
+  toJson() {
+    return {'Email': email, 'password': password};
+  }
 }
