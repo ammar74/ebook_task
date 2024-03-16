@@ -1,8 +1,9 @@
-import 'package:ebook_task/core/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_task/core/utils/constants.dart';
 import 'package:ebook_task/core/widgets/custom_button.dart';
 import 'package:ebook_task/core/widgets/show_snackbar.dart';
 import 'package:ebook_task/features/admin_panel/presentation/pages/admin_page.dart';
+import 'package:ebook_task/features/authentication/data/user_model.dart';
 import 'package:ebook_task/features/authentication/presentation/pages/registration_page.dart';
 import 'package:ebook_task/features/authentication/presentation/widgets/custom_text_field.dart';
 import 'package:ebook_task/features/book_management/presentation/pages/books_listView.dart';
@@ -99,20 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (formKey.currentState!.validate()) {
                       isLoading = true;
                       setState(() {});
-                      try {
-                        await loginUser();
-                        Navigator.pushNamed(context, BooksListViewPage.id);
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'user-not-found') {
-                          showSnackBar(context, 'User not found.');
-                        } else if (e.code == 'wrong-password') {
-                          showSnackBar(context, 'Wrong Password.');
-                        }
-                      } catch (e) {
-                        showSnackBar(context, e.toString());
-                      }
-                      isLoading = false;
-                      setState(() {});
+                      loginUser(user.email!, user.password!);
                     } else {}
                   },
                 ),
@@ -145,10 +133,44 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> loginUser() async {
-    // ignore: unused_local_variable
-    UserCredential userCredential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-            email: user.email!, password: user.password!);
+  void route() {
+    User? user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        if (documentSnapshot.get('role') == "Admin") {
+          Navigator.pushNamed(
+            context,
+            AdminPage.id,
+          );
+        } else {
+          Navigator.pushNamed(context, BooksListViewPage.id);
+        }
+      } else {
+        print('Document does not exist on the database');
+      }
+    });
+  }
+
+  Future<void> loginUser(String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      route();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showSnackBar(context, 'User not found.');
+      } else if (e.code == 'wrong-password') {
+        showSnackBar(context, 'Wrong Password.');
+      } else {
+        showSnackBar(context, e.toString());
+      }
+    }
   }
 }

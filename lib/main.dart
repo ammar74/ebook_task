@@ -1,3 +1,4 @@
+import 'package:ebook_task/core/utils/firebase_options.dart';
 import 'package:ebook_task/features/admin_panel/presentation/pages/admin_page.dart';
 import 'package:ebook_task/features/authentication/presentation/pages/login_page.dart';
 import 'package:ebook_task/features/authentication/presentation/pages/registration_page.dart';
@@ -5,7 +6,6 @@ import 'package:ebook_task/features/book_management/presentation/pages/books_lis
 import 'package:ebook_task/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

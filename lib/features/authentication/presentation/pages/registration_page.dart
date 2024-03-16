@@ -1,8 +1,10 @@
-import 'package:ebook_task/core/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_task/core/utils/constants.dart';
 import 'package:ebook_task/core/widgets/custom_button.dart';
 import 'package:ebook_task/core/widgets/show_snackbar.dart';
 import 'package:ebook_task/features/admin_panel/presentation/pages/admin_page.dart';
+import 'package:ebook_task/features/authentication/data/user_model.dart';
+import 'package:ebook_task/features/authentication/presentation/pages/login_page.dart';
 import 'package:ebook_task/features/authentication/presentation/widgets/custom_text_field.dart';
 import 'package:ebook_task/features/book_management/presentation/pages/books_listView.dart';
 import 'package:flutter/material.dart';
@@ -22,13 +24,15 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isLoading = false;
   UserModel user = UserModel();
 
-  String dropdownvalue = 'User';
+  String _currentItemSelected = 'User';
   // List of items in our dropdown menu
   var items = [
     'User',
     'Admin',
   ];
+  var role = 'User';
 
+  final _auth = FirebaseAuth.instance;
   GlobalKey<FormState> formKey = GlobalKey();
 
   @override
@@ -111,17 +115,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         color: Colors.white,
                       ),
                     ),
-                    DropdownButton(
-                      // Initial Value
-                      value: dropdownvalue,
+                    DropdownButton<String>(
+                      isDense: true,
+                      isExpanded: false,
                       icon: const Icon(Icons.keyboard_arrow_down),
+                      iconEnabledColor: Colors.white,
                       style: const TextStyle(color: Colors.black),
                       dropdownColor: Colors.white,
-                      items: items.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
+                      items: items.map((String dropDownStringItem) {
+                        return DropdownMenuItem<String>(
+                          value: dropDownStringItem,
                           child: Text(
-                            items,
+                            dropDownStringItem,
                           ),
                         );
                       }).toList(),
@@ -129,17 +134,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       // change button value to selected value
                       onChanged: (String? newValue) {
                         setState(() {
-                          dropdownvalue = newValue!;
+                          _currentItemSelected = newValue!;
+                          role = newValue;
                         });
                       },
-                      onTap: () {
-                        if (dropdownvalue == 'Admin') {
-                          user.isAdmin = true;
-                          setState(() {});
-                        } else {
-                          user.isAdmin = false;
-                        }
-                      },
+                      value: _currentItemSelected,
                     )
                   ],
                 ),
@@ -148,33 +147,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 CustomButton(
                   buttonText: 'Register',
-                  onTap: () async {
+                  onTap: () {
                     if (formKey.currentState!.validate()) {
                       isLoading = true;
                       setState(() {});
-                      try {
-                        await registerUser();
-                        if (user.isAdmin == true) {
-                          Navigator.pushNamed(
-                              context.mounted as BuildContext, AdminPage.id);
-                        } else {
-                          Navigator.pushNamed(context.mounted as BuildContext,
-                              BooksListViewPage.id);
-                        }
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'weak-password') {
-                          showSnackBar(context.mounted as BuildContext,
-                              'password is too weak.');
-                        } else if (e.code == 'Email already in-use') {
-                          showSnackBar(context.mounted as BuildContext,
-                              'Account already exists.');
-                        }
-                      } catch (e) {
-                        showSnackBar(
-                            context.mounted as BuildContext, e.toString());
-                      }
-                      isLoading = false;
-                      setState(() {});
+                      registerUser(user.email!, user.password!, role);
+
+                      setState(() {
+                        isLoading = false;
+                      });
+                      showSnackBar(context.mounted as BuildContext, 'Success.');
                     } else {}
                   },
                 ),
@@ -207,10 +189,29 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Future<void> registerUser() async {
-    // ignore: unused_local_variable
-    UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-            email: user.email!, password: user.password!);
+  Future<void> registerUser(String email, String password, String rool) async {
+    try {
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => {postDetailsToFirestore(email, rool)})
+          .catchError((e) {});
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showSnackBar(context.mounted as BuildContext, 'password is too weak.');
+      } else if (e.code == 'Email already in-use') {
+        showSnackBar(
+            context.mounted as BuildContext, 'Account already exists.');
+      }
+    } catch (e) {
+      showSnackBar(context.mounted as BuildContext, e.toString());
+    }
+  }
+
+  postDetailsToFirestore(String email, String role) async {
+    FirebaseFirestore.instance;
+    var user = _auth.currentUser;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    ref.doc(user!.uid).set({'email': user.email, 'role': role});
+    Navigator.pushNamed(context, LoginPage.id);
   }
 }
