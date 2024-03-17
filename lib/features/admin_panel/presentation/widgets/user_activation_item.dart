@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_task/core/utils/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserActivationItem extends StatefulWidget {
@@ -14,8 +12,6 @@ class UserActivationItem extends StatefulWidget {
 }
 
 class _UserActivationItemState extends State<UserActivationItem> {
-  final _auth = FirebaseAuth.instance;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -66,11 +62,5 @@ class _UserActivationItemState extends State<UserActivationItem> {
         ],
       ),
     );
-  }
-
-  activateUser(bool isActive) async {
-    FirebaseFirestore.instance;
-    CollectionReference ref = FirebaseFirestore.instance.collection('users');
-    ref.doc().set({'isActive': isActive});
   }
 }

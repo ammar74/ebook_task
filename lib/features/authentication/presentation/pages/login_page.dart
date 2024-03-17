@@ -133,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // check the type of register Whether Admin or User and route to their page
   void route() {
     User? user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance
@@ -155,6 +156,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  // a method to login using firebase Authentication
   Future<void> loginUser(String email, String password) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(

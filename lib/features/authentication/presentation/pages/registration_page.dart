@@ -206,6 +206,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+// add details to firebase firestore to put the role and activation
   postDetailsToFirestore(String email, String role, bool isActive) async {
     FirebaseFirestore.instance;
     var user = _auth.currentUser;

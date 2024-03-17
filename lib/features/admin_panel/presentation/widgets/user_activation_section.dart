@@ -31,6 +31,7 @@ class _UserActivationSectionState extends State<UserActivationSection> {
             ),
             Expanded(
               child: StreamBuilder(
+                //fetching users from firestore
                 stream:
                     FirebaseFirestore.instance.collection('users').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -45,6 +46,7 @@ class _UserActivationSectionState extends State<UserActivationSection> {
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const Center(child: Text('No users found'));
                   }
+                  // filtering users to not display Admins
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     final role = data['role'] as String?;
