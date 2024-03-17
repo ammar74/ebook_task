@@ -29,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
     'Admin',
   ];
   var role = 'User';
+  bool isActive = false;
 
   final _auth = FirebaseAuth.instance;
   GlobalKey<FormState> formKey = GlobalKey();
@@ -191,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => {postDetailsToFirestore(email, role)})
+          .then((value) => {postDetailsToFirestore(email, role, isActive)})
           .catchError((e) {});
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -205,11 +206,13 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  postDetailsToFirestore(String email, String role) async {
+  postDetailsToFirestore(String email, String role, bool isActive) async {
     FirebaseFirestore.instance;
     var user = _auth.currentUser;
     CollectionReference ref = FirebaseFirestore.instance.collection('users');
-    ref.doc(user!.uid).set({'email': user.email, 'role': role});
+    ref
+        .doc(user!.uid)
+        .set({'email': user.email, 'role': role, 'isActive': isActive});
     Navigator.pushNamed(context, LoginPage.id);
   }
 }

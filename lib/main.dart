@@ -27,7 +27,6 @@ class EbookApp extends StatelessWidget {
         LoginPage.id: (context) => const LoginPage(),
         RegisterPage.id: (context) => const RegisterPage(),
         BooksListViewPage.id: (context) => const BooksListViewPage(),
-        // HomeScreen.id: (context) => const HomeScreen(),
         AdminPage.id: (context) => const AdminPage(),
       },
       initialRoute: LoginPage.id,

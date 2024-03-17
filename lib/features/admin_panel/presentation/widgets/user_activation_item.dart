@@ -1,15 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebook_task/core/utils/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserActivationItem extends StatefulWidget {
-  const UserActivationItem({super.key});
+  UserActivationItem({super.key, required this.email, required this.isActive});
+
+  String email;
+  bool isActive;
 
   @override
   State<UserActivationItem> createState() => _UserActivationItemState();
 }
 
 class _UserActivationItemState extends State<UserActivationItem> {
-  // var userEmail;
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +29,11 @@ class _UserActivationItemState extends State<UserActivationItem> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
             child: Text(
-              'userEmail',
-              style: TextStyle(
+              widget.email,
+              style: const TextStyle(
                 fontSize: 16,
                 color: kPrimaryColor,
               ),
@@ -37,7 +42,10 @@ class _UserActivationItemState extends State<UserActivationItem> {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.isActive = true;
+                  print('66666 user is activated ${widget.isActive}');
+                },
                 icon: const Icon(
                   Icons.check_box,
                   color: kPrimaryColor,
@@ -58,5 +66,11 @@ class _UserActivationItemState extends State<UserActivationItem> {
         ],
       ),
     );
+  }
+
+  activateUser(bool isActive) async {
+    FirebaseFirestore.instance;
+    CollectionReference ref = FirebaseFirestore.instance.collection('users');
+    ref.doc().set({'isActive': isActive});
   }
 }

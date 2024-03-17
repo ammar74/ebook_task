@@ -1,4 +1,4 @@
-class Book {
+class BookModel {
   String? id;
   String? title;
   String? author;
@@ -7,7 +7,7 @@ class Book {
   String? pdfUrl;
   String? voiceUrl;
 
-  Book(
+  BookModel(
       {this.id,
       this.title,
       this.author,
